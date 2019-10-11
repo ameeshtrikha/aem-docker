@@ -1,0 +1,48 @@
+FROM ubuntu:latest
+MAINTAINER Ameesh Trikha <ameesh.trikha@gmail.com>
+
+#Install Open JDK 8
+
+RUN apt-get update
+
+RUN apt-get -y install software-properties-common
+RUN add-apt-repository -y ppa:openjdk-r/ppa
+RUN apt-get update
+RUN apt-get -y install openjdk-8-jdk
+RUN apt-get -y install nano
+
+RUN mkdir -p /opt/aem/publish
+
+WORKDIR /opt/aem/publish
+
+
+COPY ./shared/6.5/AEM_6.5_Quickstart.jar ./cq5-publish-p4503.jar
+COPY ./shared/license.properties ./license.properties
+COPY ./scripts/*.sh /opt/aem/publish/
+
+RUN java -jar cq5-publish-p4503.jar -unpack
+RUN mkdir -p /opt/aem/publish/crx-quickstart/install
+
+#expose port
+EXPOSE 4503 30303 
+
+VOLUME ["/opt/aem/publish/crx-quickstart"]
+
+#ensure script has exec permissions
+RUN chmod +x /opt/aem/publish/*.sh
+RUN chmod +x /opt/aem/publish/crx-quickstart/app/*.jar
+
+
+ARG AEM_JVM_OPTS="-server -Xms1024m -Xmx1024m -XX:MaxDirectMemorySize=256M -XX:+CMSClassUnloadingEnabled -Djava.awt.headless=true -agentlib:jdwp=transport=dt_socket,address=30304,server=y,suspend=n"
+ARG AEM_START_OPTS="start -c /opt/aem/publish/crx-quickstart -i launchpad -p 4503"
+ARG AEM_RUNMODE="-Dsling.run.modes=publish,crx3,crx3tar,samplecontent"
+ARG PACKAGE_PATH="./crx-quickstart/install"
+ARG AEM_JAR="/opt/aem/publish/crx-quickstart/app/*.jar"
+
+ENV AEM_JVM_OPTS="${AEM_JVM_OPTS}" \
+    AEM_START_OPTS="${AEM_START_OPTS}"\
+    AEM_RUNMODE="${AEM_RUNMODE}"\
+    AEM_JARFILE="${AEM_JAR}"
+
+#make java pid 1
+ENTRYPOINT ["/bin/bash", "--", "/opt/aem/publish/run-aem.sh"]

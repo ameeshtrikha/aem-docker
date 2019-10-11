@@ -1,0 +1,1 @@
+docker run -it -p 4503:4503 -p 30304:30304 --mount source=publish-crx,target=/opt/aem/publish/crx-quickstart aem:publish

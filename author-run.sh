@@ -1,0 +1,1 @@
+docker run -it -p 4502:4502 -p 30303:30303 --mount source=author-crx,target=/opt/aem/author/crx-quickstart aem:author
