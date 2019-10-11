@@ -21,6 +21,8 @@ COPY ./shared/license.properties ./license.properties
 COPY ./scripts/*.sh /opt/aem/author/
 
 RUN java -jar cq5-author-p4502.jar -unpack
+RUN mkdir -p /opt/aem/author/crx-quickstart/install
+COPY ./shared/6.5/AEM-6.5.2.0-6.5.2.zip ./crx-quickstart/install/AEM-6.5.2.0-6.5.2.zip
 
 #expose port
 EXPOSE 4502 30303 
@@ -39,7 +41,6 @@ RUN chmod +x /opt/aem/author/crx-quickstart/app/*.jar
 ARG AEM_JVM_OPTS="-server -Xms1024m -Xmx1024m -XX:MaxDirectMemorySize=256M -XX:+CMSClassUnloadingEnabled -Djava.awt.headless=true -agentlib:jdwp=transport=dt_socket,address=30303,server=y,suspend=n"
 ARG AEM_START_OPTS="start -c /opt/aem/author/crx-quickstart -i launchpad -p 4502"
 ARG AEM_RUNMODE="-Dsling.run.modes=author,crx3,crx3tar,samplecontent"
-ARG PACKAGE_PATH="./crx-quickstart/install"
 ARG AEM_JAR="/opt/aem/author/crx-quickstart/app/*.jar"
 
 ENV AEM_JVM_OPTS="${AEM_JVM_OPTS}" \
@@ -48,4 +49,4 @@ ENV AEM_JVM_OPTS="${AEM_JVM_OPTS}" \
     AEM_JARFILE="${AEM_JAR}"
 
 #make java pid 1
-ENTRYPOINT ["/bin/bash", "--", "/opt/aem/author/run-aem.sh"]
+ENTRYPOINT ["/bin/bash", "--", "/opt/aem/author/run-aem.sh &"]

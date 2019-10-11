@@ -22,6 +22,7 @@ COPY ./scripts/*.sh /opt/aem/publish/
 
 RUN java -jar cq5-publish-p4503.jar -unpack
 RUN mkdir -p /opt/aem/publish/crx-quickstart/install
+COPY ./shared/6.5/AEM-6.5.2.0-6.5.2.zip ./crx-quickstart/install/AEM-6.5.2.0-6.5.2.zip
 
 #expose port
 EXPOSE 4503 30303 
